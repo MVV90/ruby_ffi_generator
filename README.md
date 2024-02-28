@@ -34,7 +34,7 @@ You can follow the [quickstart](quickstart.md) guide to install everything in a 
 Use the following interface in a script or Rake task:
 
 ```ruby
-require "ffi_gen"
+require "ffi_generator"
 
 FFIGen.generate(
   module_name: "Clang",

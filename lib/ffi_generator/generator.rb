@@ -22,7 +22,7 @@ module FFIGen
       code = send("generate_#{File.extname(@output)[1..-1]}")
       if @output.is_a?(String)
         File.open(@output, "w") { |file| file.write(code) }
-        puts "ffi_gen: #{@output}"
+        puts "ffi_generator: #{@output}"
       else
         @output.write(code)
       end
