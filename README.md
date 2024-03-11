@@ -36,7 +36,7 @@ Use the following interface in a script or Rake task:
 ```ruby
 require "ffi_generator"
 
-FFIGen.generate(
+FFIGenerate.generate(
   module_name: "Clang",
   ffi_lib:     "clang",
   headers:     ["clang-c/Index.h"],
@@ -46,9 +46,9 @@ FFIGen.generate(
 )
 ```
 
-Output: [clang-c/index.rb](https://github.com/neelance/ffi_gen/blob/master/test/output/clang-c/Index.rb)
+Output: [clang-c/index.rb](https://github.com/neelance/ffi_generator/blob/master/test/output/clang-c/Index.rb)
 
-Other generated files can be found in the [test/output](https://github.com/neelance/ffi_gen/tree/master/test/output) directory.
+Other generated files can be found in the [test/output](https://github.com/neelance/ffi_generator/tree/master/test/output) directory.
 
 
 ## Hints
@@ -66,7 +66,7 @@ Your GCC include paths can be seen with:
 ```
 
 
-## Projects using ffi_gen
+## Projects using ffi_generator
 
 * https://github.com/jvoorhis/ruby-llvm
 

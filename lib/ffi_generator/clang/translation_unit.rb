@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   module Clang
 
     # A single translation unit, which resides in an index.

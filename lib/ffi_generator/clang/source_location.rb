@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   module Clang
 
     # Identifies a specific source location within a translation unit.

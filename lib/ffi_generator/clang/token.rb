@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   module Clang
 
     # Describes a single preprocessing token.

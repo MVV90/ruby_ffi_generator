@@ -12,7 +12,7 @@ def run_test(options = {})
     output_file = "#{File.dirname(__FILE__)}/output/#{header.sub(/\.h$/, ".rb")}"
     FileUtils.mkdir_p File.dirname(output_file)
 
-    FFIGen.generate(
+    FFIGenerate.generate(
       module_name: options[:library_name],
       ffi_lib:     options[:ffi_lib],
       headers:     [header],

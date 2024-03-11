@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   module Clang
 
     # A cursor representing some element in the abstract syntax tree for

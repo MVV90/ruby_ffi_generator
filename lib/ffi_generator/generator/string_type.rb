@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   class Generator
     class StringType < Type
 
