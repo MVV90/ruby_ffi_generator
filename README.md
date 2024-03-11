@@ -1,6 +1,6 @@
 # A generator for Ruby FFI bindings
 
-*Author:* Richard Musiol
+*Original Author:* Richard Musiol
 *Contributors:* Jeremy Voorhis (thanks for the initial idea)
 *License:* MIT (see LICENSE)
 
@@ -28,15 +28,14 @@
 
 You can follow the [quickstart](quickstart.md) guide to install everything in a docker container and try out this gem.
 
-
 ## Example
 
 Use the following interface in a script or Rake task:
 
 ```ruby
-require "ffi_gen"
+require "ffi_generator"
 
-FFIGen.generate(
+FFIGenerate.generate(
   module_name: "Clang",
   ffi_lib:     "clang",
   headers:     ["clang-c/Index.h"],
@@ -46,9 +45,9 @@ FFIGen.generate(
 )
 ```
 
-Output: [clang-c/index.rb](https://github.com/neelance/ffi_gen/blob/master/test/output/clang-c/Index.rb)
+Output: [clang-c/index.rb](https://github.com/MVV90/ruby_ffi_generator/blob/main/test/output/clang-c/Index.rb)
 
-Other generated files can be found in the [test/output](https://github.com/neelance/ffi_gen/tree/master/test/output) directory.
+Other generated files can be found in the [test/output](https://github.com/MVV90/ruby_ffi_generator/tree/main/test/output) directory.
 
 
 ## Hints
@@ -64,21 +63,3 @@ Your GCC include paths can be seen with:
 ```
 `gcc -print-prog-name=cc1` -v
 ```
-
-
-## Projects using ffi_gen
-
-* https://github.com/jvoorhis/ruby-llvm
-
-
-## Roadmap
-
-* Support for more libraries:
-  * (Write me if you have a whish)
-* Automatic generation of object oriented wrappers
-* Polish YARD documentation comments some more
-
-
-## Feedback
-
-Please use GitHub's issue tracker for problems or suggestions. Pull requests are welcome, too.

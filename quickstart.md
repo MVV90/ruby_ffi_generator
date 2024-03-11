@@ -3,7 +3,7 @@
 If you want to quickly set up the environment and try out this gem then you can follow these steps.
 
 ```bash
-docker run -it --name ffi_gen ubuntu bash
+docker run -it --name ffi_generator ubuntu bash
 # continue in the container
 
 # prepare container
@@ -22,9 +22,9 @@ apt install ruby ruby-dev
 gem install bundler
 
 # install gem
-gem install ffi_gen
+gem install ffi_generator
 
-# you can try using ffi_gen now
+# you can try using ffi_generator now
 
 # for running tests
 apt install libcairo-dev
