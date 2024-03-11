@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   module Clang
 
     # The type of an element in the abstract syntax tree.
@@ -18,7 +18,7 @@ module FFIGen
       end
 
       # Return the canonical type for a CXType.
-      # 
+      #
       # Clang's type system explicitly models typedefs and all the ways
       # a specific type can be represented.  The canonical type is the underlying
       # type with all the "sugar" removed.  For example, if 'T' is a typedef

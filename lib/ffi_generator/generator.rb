@@ -1,4 +1,4 @@
-module FFIGen
+module FFIGenerate
   class Generator
 
     attr_reader :module_name, :ffi_lib, :headers, :prefixes, :output, :cflags

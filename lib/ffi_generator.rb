@@ -29,7 +29,7 @@ require 'ffi_generator/generator/java'
 require 'ffi_generator/generator/ruby'
 
 
-module FFIGen
+module FFIGenerate
 
   def self.generate(options = {})
     Generator.new(options).generate
@@ -39,8 +39,8 @@ end
 
 
 if __FILE__ == $0
-  FFIGen.generate(
-    module_name: "FFIGen::Clang::C",
+  FFIGenerate.generate(
+    module_name: "FFIGenerate::Clang::C",
     ffi_lib:     'clang-15',
     headers:     ["clang-c/CXErrorCode.h", "clang-c/CXString.h", "clang-c/Index.h"],
     cflags:      `llvm-config-15 --cflags`.split(" "),
