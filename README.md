@@ -1,8 +1,8 @@
 # A generator for Ruby FFI bindings
 
-*Original Author:* Richard Musiol
-*Contributors:* Jeremy Voorhis (thanks for the initial idea)
-*License:* MIT (see LICENSE)
+- *Original Author:* Richard Musiol
+- *Contributors:* Jeremy Voorhis (thanks for the initial idea)
+- *License:* MIT (see LICENSE)
 
 
 ## Features
