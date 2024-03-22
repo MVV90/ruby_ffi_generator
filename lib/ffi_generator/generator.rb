@@ -457,7 +457,7 @@ module FFIGenerate
       trimmed = transform_by_renaming_imported_function_names(source)
       trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
       trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
-      # parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
+      # parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?) # TODO: deprecate with prefixes
       parts = trimmed.split(/_/).reject(&:empty?)
       Name.new(parts, source)
     end
@@ -505,14 +505,14 @@ module FFIGenerate
       if @rename_imported_functions && @rename_imported_functions.is_a?(Hash)
         if @rename_imported_functions[:when_matches_regex].is_a?(Array)
           @rename_imported_functions[:when_matches_regex].each do |operation|
-            if operation.is_a? Hash
+            if operation.is_a?(Hash)
               func_name = transform_function_name(func_name, operation)
             end
           end
         end
         if @rename_imported_functions[:when_func_name_matches_regex].is_a?(Array)
           @rename_imported_functions[:when_func_name_matches_regex].each do |operation|
-            if operation.is_a? Hash
+            if operation.is_a?(Hash)
               func_name = transform_function_name(func_name, operation)
             end
           end
