@@ -28,7 +28,8 @@ module FFIGenerate
 
       def puts(*lines)
         lines.each do |line|
-          @output << "#{@current_indentation}#{line}\n"
+          @output << "#{@current_indentation}#{line}" unless line.strip.empty?
+          @output << "\n"
         end
       end
 
