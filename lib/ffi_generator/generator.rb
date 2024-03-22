@@ -1,28 +1,37 @@
 module FFIGenerate
   class Generator
 
-    attr_reader :module_name, :ffi_lib, :headers, :prefixes, :output, :cflags
+    attr_reader :module_name,
+                :headers,
+                :cflags,
+                :ffi_lib,
+                :ffi_lib_flags,
+                :blocking,
+                :output,
+                :translation_unit,
+                :declarations,
+                :rename_imported_functions
 
     def initialize(options = {})
       @module_name   = options[:module_name] || fail("No module name given.")
-      @ffi_lib       = options.fetch(:ffi_lib, nil)
       @headers       = options[:headers] || fail("No headers given.")
       @cflags        = options.fetch(:cflags, [])
-      @prefixes      = options.fetch(:prefixes, [])
-      @suffixes      = options.fetch(:suffixes, [])
-      @blocking      = options.fetch(:blocking, [])
+      @ffi_lib       = options.fetch(:ffi_lib, nil)
       @ffi_lib_flags = options.fetch(:ffi_lib_flags, nil)
+      @blocking      = options.fetch(:blocking, [])
       @output        = options.fetch(:output, $stdout)
-
       @translation_unit = nil
       @declarations = nil
+      @rename_imported_functions = options[:rename_imported_functions]
+      # @prefixes      = options.fetch(:prefixes, [])
+      # @suffixes      = options.fetch(:suffixes, [])
     end
 
     def generate
       code = send("generate_#{File.extname(@output)[1..-1]}")
       if @output.is_a?(String)
         File.open(@output, "w") { |file| file.write(code) }
-        puts "ffi_generator: #{@output}"
+        puts "lib/ffi_generator/generator.rb - Created new FFI wrapper: #{@output}"
       else
         @output.write(code)
       end
@@ -443,10 +452,79 @@ module FFIGenerate
     def read_name(source)
       source = source.spelling if source.is_a?(Clang::Cursor)
       return nil if source.empty?
-      trimmed = source.sub(/^(#{@prefixes.join('|')})/, '')
-      trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
+      trimmed = transform_by_renaming_imported_function_names(source)
       parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
       Name.new(parts, source)
+    end
+
+    # Rename imported library function names based on regex patterns.
+    #
+    # The interface follows this data structure:
+    #
+    # rename_imported_functions: {
+    #   # or alias when_func_name_matches_regex: [
+    #   when_matches_regex: [
+    #     {
+    #       regex_pattern: /^example_/,
+    #       replace_with: "",
+    #       append_to_start: "f__",
+    #     },
+    #     {
+    #       regex_pattern: "my_name_to_match",
+    #       replace_with: "__my_custom_name",
+    #     },
+    #     {
+    #       regex_pattern: /has_a/,
+    #       append_to_end: "?",
+    #       append_to_start: "rb_",
+    #     }
+    #   ]
+    # },
+    #
+    # Which if the C/C++ header has functions named:
+    # - example_lib_call_1
+    # - has_a_thing
+    # - my_name_to_match
+    #
+    # They will transform to ruby functions named:
+    # - f__lib_call_1
+    # - rb_has_a_thing?
+    # - __my_custom_name
+    #
+    def transform_by_renaming_imported_function_names(func_name)
+      if @rename_imported_functions && @rename_imported_functions.is_a? Hash
+        if @rename_imported_functions[:when_matches_regex].is_a? Array
+          @rename_imported_functions[:when_matches_regex].each do |operation|
+            if operation.is_a? Hash
+              func_name = transform_function_name(func_name, operation)
+            end
+          end
+        end
+        if @rename_imported_functions[:when_func_name_matches_regex].is_a? Array
+          @rename_imported_functions[:when_func_name_matches_regex].each do |operation|
+            if operation.is_a? Hash
+              func_name = transform_function_name(func_name, operation)
+            end
+          end
+        end
+      end
+
+      func_name
+    end
+
+    def transform_function_name(func_name, operation)
+      found_match = func_name[operation[:regex_pattern]]
+      append_to_start = !operation[:append_to_start].to_s.empty?
+      append_to_end = !operation[:append_to_end].to_s.empty?
+      replace_with = !operation[:replace_with].to_s.empty?
+
+      if found_match
+        func_name = "#{operation[:append_to_start]}#{func_name}" if append_to_start
+        func_name += operation[:append_to_end] if append_to_end
+        func_name = func_name.gsub(operation[:regex_pattern], operation[:replace_with]) if replace_with
+      end
+
+      func_name
     end
 
     def get_pointee_declaration(type)
@@ -485,7 +563,7 @@ module FFIGenerate
     end
 
     def inspect
-      "#<#{self.class.name}:#{object_id} module_name:#{@module_name} ffi_lib:#{@ffi_lib} headers:#{@headers} cflags:#{cflags} prefixes:#{@prefixes} suffixes:#{@suffixes} blocking:#{@blocking} ffi_lib_flags:#{@ffi_lib_flags} output:#{@output} >"
+      "#<#{self.class.name}:#{object_id} module_name:#{@module_name} ffi_lib:#{@ffi_lib} headers:#{@headers} cflags:#{cflags} blocking:#{@blocking} ffi_lib_flags:#{@ffi_lib_flags} output:#{@output} >"
     end
 
   end
