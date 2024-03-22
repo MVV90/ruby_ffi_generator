@@ -241,14 +241,14 @@ module FFIGenerate
       first_parameter_type = nil
       declaration_cursor.children.each do |function_child|
         next if function_child.kind != :parm_decl
-        param_name = read_name(function_child)
+        param_name = read_name(function_child, :is_function)
         tokens = function_child.extent.tokens
         is_array = tokens.any? { |t| t.spelling == "[" }
         param_type = resolve_type(function_child.type, is_array)
         param_name ||= param_type.name
         param_name ||= Name.new([])
         first_parameter_type ||= function_child.type
-        parameters << { name: param_name, type: param_type }
+        parameters << { name: param_name, type: param_type, tokens: tokens }
       end
 
       parameters.each_with_index do |parameter, index|
@@ -451,10 +451,11 @@ module FFIGenerate
       end
     end
 
-    def read_name(source)
+    def read_name(source, object_type=nil)
       source = source.spelling if source.is_a?(Clang::Cursor)
       return nil if source.empty?
-      trimmed = transform_by_renaming_imported_function_names(source)
+      trimmed = source
+      trimmed = transform_by_renaming_imported_function_names(trimmed) if object_type == :is_function
       trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
       trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
       # parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?) # TODO: deprecate with prefixes
