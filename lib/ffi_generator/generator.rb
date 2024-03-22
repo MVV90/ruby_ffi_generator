@@ -92,7 +92,7 @@ module FFIGenerate
     end
 
     def read_declaration(declaration_cursor, comment)
-      name = read_name(declaration_cursor)
+      name = read_name(declaration_cursor, :is_function)
 
       declaration = case declaration_cursor.kind
       when :enum_decl
