@@ -487,14 +487,19 @@ module FFIGenerate
     # },
     #
     # Which if the C/C++ header has functions named:
-    # - example_lib_call_1
-    # - has_a_thing
-    # - my_name_to_match
+    #  - example_lib_call_1
+    #  - has_a_thing
+    #  - my_name_to_match
     #
     # They will transform to ruby functions named:
-    # - f__lib_call_1
-    # - rb_has_a_thing?
-    # - __my_custom_name
+    #  - f__lib_call_1
+    #  - rb_has_a_thing?
+    #  - __my_custom_name
+    #
+    # Order of transform operations is:
+    #  1. replace_with
+    #  2. append_to_start
+    #  3. append_to_end
     #
     def transform_by_renaming_imported_function_names(func_name)
       if @rename_imported_functions && @rename_imported_functions.is_a?(Hash)
@@ -524,6 +529,10 @@ module FFIGenerate
       replace_with = operation.keys.include?(:replace_with)
 
       if found_match
+        # *Update the docs if you change the ordering of these operations* which should be:
+        #  1. replace_with
+        #  2. append_to_start
+        #  3. append_to_end
         func_name = func_name.gsub(operation[:regex_pattern], operation[:replace_with]) if replace_with
         func_name = "#{operation[:append_to_start]}#{func_name}" if append_to_start
         func_name += operation[:append_to_end] if append_to_end
