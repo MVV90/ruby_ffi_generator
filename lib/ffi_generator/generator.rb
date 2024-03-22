@@ -457,7 +457,8 @@ module FFIGenerate
       trimmed = transform_by_renaming_imported_function_names(source)
       trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
       trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
-      parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
+      # parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
+      parts = trimmed.split(/_/).reject(&:empty?)
       Name.new(parts, source)
     end
 
@@ -520,12 +521,12 @@ module FFIGenerate
       found_match = func_name[operation[:regex_pattern]]
       append_to_start = !operation[:append_to_start].to_s.empty?
       append_to_end = !operation[:append_to_end].to_s.empty?
-      replace_with = !operation[:replace_with].to_s.empty?
+      replace_with = operation.keys.include?(:replace_with)
 
       if found_match
+        func_name = func_name.gsub(operation[:regex_pattern], operation[:replace_with]) if replace_with
         func_name = "#{operation[:append_to_start]}#{func_name}" if append_to_start
         func_name += operation[:append_to_end] if append_to_end
-        func_name = func_name.gsub(operation[:regex_pattern], operation[:replace_with]) if replace_with
       end
 
       func_name
