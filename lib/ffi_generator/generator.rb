@@ -10,7 +10,9 @@ module FFIGenerate
                 :output,
                 :translation_unit,
                 :declarations,
-                :rename_imported_functions
+                :rename_imported_functions,
+                :prefixes,  # TODO: deprecated
+                :suffixes   # TODO: deprecated
 
     def initialize(options = {})
       @module_name   = options[:module_name] || fail("No module name given.")
@@ -23,8 +25,8 @@ module FFIGenerate
       @translation_unit = nil
       @declarations = nil
       @rename_imported_functions = options[:rename_imported_functions]
-      # @prefixes      = options.fetch(:prefixes, [])
-      # @suffixes      = options.fetch(:suffixes, [])
+      @prefixes      = options.fetch(:prefixes, []) # TODO: deprecated
+      @suffixes      = options.fetch(:suffixes, []) # TODO: deprecated
     end
 
     def generate
@@ -453,6 +455,8 @@ module FFIGenerate
       source = source.spelling if source.is_a?(Clang::Cursor)
       return nil if source.empty?
       trimmed = transform_by_renaming_imported_function_names(source)
+      trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
+      trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
       parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
       Name.new(parts, source)
     end
