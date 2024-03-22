@@ -496,15 +496,15 @@ module FFIGenerate
     # - __my_custom_name
     #
     def transform_by_renaming_imported_function_names(func_name)
-      if @rename_imported_functions && @rename_imported_functions.is_a? Hash
-        if @rename_imported_functions[:when_matches_regex].is_a? Array
+      if @rename_imported_functions && @rename_imported_functions.is_a?(Hash)
+        if @rename_imported_functions[:when_matches_regex].is_a?(Array)
           @rename_imported_functions[:when_matches_regex].each do |operation|
             if operation.is_a? Hash
               func_name = transform_function_name(func_name, operation)
             end
           end
         end
-        if @rename_imported_functions[:when_func_name_matches_regex].is_a? Array
+        if @rename_imported_functions[:when_func_name_matches_regex].is_a?(Array)
           @rename_imported_functions[:when_func_name_matches_regex].each do |operation|
             if operation.is_a? Hash
               func_name = transform_function_name(func_name, operation)
