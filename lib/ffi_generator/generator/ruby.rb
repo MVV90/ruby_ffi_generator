@@ -146,7 +146,10 @@ module FFIGenerate
     end
 
     class FunctionOrCallback
+      attr_accessor :writer
+
       def write_ruby(writer)
+        @writer = writer
         writer.puts "@blocking = true" if @blocking
         writer.comment do
           writer.write_description @function_description
