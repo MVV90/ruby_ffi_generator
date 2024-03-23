@@ -227,7 +227,7 @@ module FFIGenerate
       return_value_description = []
       parameter_descriptions = {}
       current_description = function_description
-      has_unsupported_variables = false
+      has_unsupported_variables = nil
       parameters = []
       first_parameter_type = nil
 
@@ -280,9 +280,9 @@ module FFIGenerate
         end
       end
 
-      if has_unsupported_variables
+      if has_unsupported_variables && has_unsupported_variables[0]
         # TODO: depending on the type of unsupported, we should give failure reasons
-        function.failed_clang_parse = true
+        function.failed_clang_parse_metadata = has_unsupported_variables[1]
       end
 
       return function
@@ -291,14 +291,19 @@ module FFIGenerate
     def check_unsupported_c_features(tokens)
       # TODO: add more unsupported feature checks here
       found_unsupported = false
+      failed_metadata = {}
+      failed_metadata[:failed_reasons] = []
 
       # va_list - Is a macro which creates a hard to parse situation.
       #         - If we compiled to a ruby c-extension we could
       #         - wrap the va_list with an interface.
       #         - docs: https://pubs.opengroup.org/onlinepubs/000095399/basedefs/stdarg.h.html
-      found_unsupported |= tokens.select{|token| token.spelling == "va_list"}.any?
+      if tokens.select{|token| token.spelling == "va_list"}.any?
+        found_unsupported = true
+        failed_metadata[:failed_reasons] << "Found macro 'va_list' which cannot be parsed easily. This 'va_list' macro would require compilation to determine full type information."
+      end
 
-      return found_unsupported
+      return found_unsupported, failed_metadata
     end
 
     def read_typedef_declaration(declaration_cursor, comment, name)

@@ -4,7 +4,7 @@ module FFIGenerate
 
       attr_reader :name, :parameters, :return_type, :function_description, :return_value_description
 
-      attr_accessor :failed_clang_parse
+      attr_accessor :failed_clang_parse_metadata
 
       def initialize(generator, name, parameters, return_type, is_callback, blocking, function_description, return_value_description)
         @generator = generator
@@ -15,7 +15,7 @@ module FFIGenerate
         @blocking = blocking
         @function_description = function_description
         @return_value_description = return_value_description
-        @failed_clang_parse = false
+        @failed_clang_parse_metadata = false
       end
 
     end

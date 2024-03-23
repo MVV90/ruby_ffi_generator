@@ -176,13 +176,23 @@ module FFIGenerate
       end
 
       def write_attach_function(ruby_name, ffi_signature)
-        if @failed_clang_parse
-          failed_msg = "# FAILED FFI WRAPPER GENERATION --> attach_function :#{ruby_name}, :#{@name.raw}, #{ffi_signature}"
-          writer.puts(failed_msg, "")
+        if @failed_clang_parse_metadata
+          pre_msg = "# FAILED FFI WRAPPER GENERATION --|"
+          failed_msg = "#{pre_msg} #{ruby_name} - Error: Cannot attach_function for :#{@name.raw} with signature #{ffi_signature}"
+          writer.puts failed_msg
           puts failed_msg
+
+          @failed_clang_parse_metadata[:failed_reasons].each do |msg|
+            failed_msg = "#{pre_msg} #{ruby_name} - Error: #{msg}"
+            writer.puts failed_msg
+            puts failed_msg
+          end
+
         else
-          writer.puts("attach_function :#{ruby_name}, :#{@name.raw}, #{ffi_signature}", "")
+          writer.puts("attach_function :#{ruby_name}, :#{@name.raw}, #{ffi_signature}")
         end
+
+        writer.puts
       end
 
       def ruby_name
