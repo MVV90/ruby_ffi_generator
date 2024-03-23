@@ -227,6 +227,10 @@ module FFIGenerate
       return_value_description = []
       parameter_descriptions = {}
       current_description = function_description
+      has_unsupported_variables = false
+      parameters = []
+      first_parameter_type = nil
+
       comment.each do |line|
         if line.gsub!(/\\param (.*?) /, '')
           current_description = []
@@ -237,10 +241,10 @@ module FFIGenerate
       end
 
       return_type = resolve_type(declaration_cursor.result_type)
-      parameters = []
-      first_parameter_type = nil
+
       declaration_cursor.children.each do |function_child|
         next if function_child.kind != :parm_decl
+
         param_name = read_name(function_child, :is_function)
         tokens = function_child.extent.tokens
         is_array = tokens.any? { |t| t.spelling == "[" }
@@ -248,6 +252,9 @@ module FFIGenerate
         param_name ||= param_type.name
         param_name ||= Name.new([])
         first_parameter_type ||= function_child.type
+
+        has_unsupported_variables = check_unsupported_c_features(tokens)
+
         parameters << { name: param_name, type: param_type, tokens: tokens }
       end
 
@@ -273,7 +280,25 @@ module FFIGenerate
         end
       end
 
+      if has_unsupported_variables
+        # TODO: depending on the type of unsupported, we should give failure reasons
+        function.failed_clang_parse = true
+      end
+
       return function
+    end
+
+    def check_unsupported_c_features(tokens)
+      # TODO: add more unsupported feature checks here
+      found_unsupported = false
+
+      # va_list - Is a macro which creates a hard to parse situation.
+      #         - If we compiled to a ruby c-extension we could
+      #         - wrap the va_list with an interface.
+      #         - docs: https://pubs.opengroup.org/onlinepubs/000095399/basedefs/stdarg.h.html
+      found_unsupported |= tokens.select{|token| token.spelling == "va_list"}.any?
+
+      return found_unsupported
     end
 
     def read_typedef_declaration(declaration_cursor, comment, name)
