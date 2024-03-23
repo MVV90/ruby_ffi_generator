@@ -281,7 +281,6 @@ module FFIGenerate
       end
 
       if has_unsupported_variables && has_unsupported_variables[0]
-        # TODO: depending on the type of unsupported, we should give failure reasons
         function.failed_clang_parse_metadata = has_unsupported_variables[1]
       end
 
