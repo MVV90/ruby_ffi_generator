@@ -30,6 +30,7 @@ module FFIGenerate
     end
 
     def generate
+      auto_include_c_paths
       code = send("generate_#{File.extname(@output)[1..-1]}")
       if @output.is_a?(String)
         File.open(@output, "w") { |file| file.write(code) }
@@ -37,6 +38,10 @@ module FFIGenerate
       else
         @output.write(code)
       end
+    end
+
+    def auto_include_c_paths
+      # TODO
     end
 
     def translation_unit
