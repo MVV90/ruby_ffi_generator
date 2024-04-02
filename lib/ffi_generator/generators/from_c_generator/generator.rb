@@ -67,7 +67,7 @@ module FFIGenerate
         output = output.split("#include <...> search starts here:").last
         output = output.split("End of search list.").first
         paths = output.split("\n").map(&:strip)
-        paths = paths.select {|path| File.directory?(path)} # Remove anything not valid. Example: mac has gives a "System/Library/Frameworks (framework directory)" output, that appears we can skip without consequences.
+        paths = paths.select {|path| File.directory?(path)} # Remove anything not valid. Example: mac gives "System/Library/Frameworks (framework directory)" output, that appears we can skip without consequences.
         paths
       end.flatten.uniq
 
