@@ -4,6 +4,8 @@ module FFIGenerate
 
       attr_reader :parts, :raw
 
+      RUBY_KEYWORDS = %w{alias and begin break case class def defined do else elsif end ensure false for if in module next nil not or redo rescue retry return self super then true undef unless until when while yield BEGIN END}
+
       def initialize(parts, raw = nil)
         @parts = parts
         @raw = raw
@@ -19,6 +21,18 @@ module FFIGenerate
         str.sub!(/^\d/, '_\0') # fix illegal beginnings
         str = "#{str}_" if keyword_blacklist.include?(str)
         str
+      end
+
+      def to_ruby_downcase
+        format :downcase, :underscores, RUBY_KEYWORDS
+      end
+
+      def to_ruby_classname
+        format :camelcase, RUBY_KEYWORDS
+      end
+
+      def to_ruby_constant
+        format :upcase, :underscores, RUBY_KEYWORDS
       end
 
     end
