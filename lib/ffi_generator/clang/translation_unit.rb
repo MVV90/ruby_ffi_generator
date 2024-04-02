@@ -31,7 +31,7 @@ module FFIGenerate
         args_ptr.write_array_of_pointer(pointers)
 
         # TODO: use clang_parseTranslationUnit2 instead for a better error output?
-        c = C.parse_translation_unit(@index.c, File.join(File.dirname(__FILE__), "../empty.h"), args_ptr, args.size, nil, 0, Clang::C.enum_type(:translation_unit_flags)[:detailed_preprocessing_record])
+        c = C.parse_translation_unit(@index.c, File.join(File.dirname(__FILE__), "./empty.h"), args_ptr, args.size, nil, 0, Clang::C.enum_type(:translation_unit_flags)[:detailed_preprocessing_record])
         raise 'failed to parse translation unit' if c == FFI::Pointer::NULL
 
         return c

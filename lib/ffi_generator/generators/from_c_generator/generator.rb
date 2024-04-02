@@ -1,5 +1,14 @@
+require "open3"
+
 module FFIGenerate
   class Generator
+
+    C_PATH_COMMANDS = [
+      "gcc     -E -Wp,-v -xc   /dev/null",
+      "clang   -E -Wp,-v -xc   /dev/null",
+      "g++     -E -Wp,-v -xc++ /dev/null",
+      "clang++ -E -Wp,-v -xc++ /dev/null",
+    ]
 
     attr_reader :module_name,
                 :headers,
@@ -11,6 +20,7 @@ module FFIGenerate
                 :translation_unit,
                 :declarations,
                 :rename_imported_functions,
+                :skip_cpath_auto_includes,
                 :prefixes,  # TODO: deprecated
                 :suffixes   # TODO: deprecated
 
@@ -18,20 +28,23 @@ module FFIGenerate
       @module_name   = options[:module_name] || fail("No module name given.")
       @headers       = options[:headers] || fail("No headers given.")
       @cflags        = options.fetch(:cflags, [])
-      @ffi_lib       = options.fetch(:ffi_lib, nil)
-      @ffi_lib_flags = options.fetch(:ffi_lib_flags, nil)
+      @ffi_lib       = options[:ffi_lib]
+      @ffi_lib_flags = options[:ffi_lib_flags]
+      @ffi_lib_path_env = "#{@module_name.upcase}_PATH".gsub(/[\W]+/, "")
       @blocking      = options.fetch(:blocking, [])
       @output        = options.fetch(:output, $stdout)
       @translation_unit = nil
       @declarations = nil
       @rename_imported_functions = options[:rename_imported_functions]
+      @skip_cpath_auto_includes = !!options.fetch(:skip_cpath_auto_includes, false)
       @prefixes      = options.fetch(:prefixes, []) # TODO: deprecated
       @suffixes      = options.fetch(:suffixes, []) # TODO: deprecated
+
+      auto_include_c_paths
     end
 
     def generate
-      auto_include_c_paths
-      code = send("generate_#{File.extname(@output)[1..-1]}")
+      code = send("generate_rb")
       if @output.is_a?(String)
         File.open(@output, "w") { |file| file.write(code) }
         puts "lib/ffi_generator/generator.rb - Created new FFI wrapper: #{@output}"
@@ -41,7 +54,32 @@ module FFIGenerate
     end
 
     def auto_include_c_paths
-      # TODO
+      return puts("Skipping CPATH mutation - found skip_cpath_auto_includes") if @skip_cpath_auto_includes
+
+      include_dirs = C_PATH_COMMANDS.map do |cmd|
+        _, _, stdout, stderr = run_shell(cmd)
+        output = stdout.to_s + "\n" + stderr.to_s
+        #
+        # Output contains both include types, but we only need one.
+        # Skip  -->      #include "..."
+        # only need -->  #include <...>
+        #
+        output = output.split("#include <...> search starts here:").last
+        output = output.split("End of search list.").first
+        paths = output.split("\n").map(&:strip)
+        paths = paths.select {|path| File.directory?(path)} # Remove anything not valid. Example: mac has gives a "System/Library/Frameworks (framework directory)" output, that appears we can skip without consequences.
+        paths
+      end.flatten.uniq
+
+      ENV["CPATH"] = ([ENV["CPATH"]] + include_dirs).compact.join(":") if include_dirs.length >= 1
+      puts "CPATH is: #{ENV["CPATH"]}"
+      include_dirs
+    end
+
+    def run_shell(cmd)
+      process_thread_waiter, proces_return_code, stdout, stderr = Open3.popen3(cmd) do |stdin, stdout, stderr, process_thread_waiter|
+        [process_thread_waiter, process_thread_waiter.value.to_i, stdout.read, stderr.read]
+      end
     end
 
     def translation_unit
