@@ -25,7 +25,6 @@ require 'ffi_generator/generators/from_c_generator/string_type'
 require 'ffi_generator/generators/from_c_generator/struct_or_union'
 require 'ffi_generator/generators/from_c_generator/unknown_type'
 require 'ffi_generator/generators/from_c_generator/writer'
-require 'ffi_generator/generators/from_c_generator/ruby'
 
 # TODO: dynamically require what we need based on the request.
 #

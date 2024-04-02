@@ -11,6 +11,22 @@ module FFIGenerate
         Name.new(["array"])
       end
 
+      def ruby_name
+        "array"
+      end
+
+      def ruby_ffi_type
+        if @constant_size
+          "[#{@element_type.ruby_ffi_type}, #{@constant_size}]"
+        else
+          ":pointer"
+        end
+      end
+
+      def ruby_description
+        "Array<#{@element_type.ruby_description}>"
+      end
+
     end
   end
 end
