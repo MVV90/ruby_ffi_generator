@@ -591,11 +591,11 @@ module FFIGenerate
       trimmed = transform_by_renaming_imported_function_names(trimmed) if object_type == :is_function
       trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
       trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
-      parts = pascal_case_to_snake_case(trimmed)
+      parts = split_by_pascal_case(trimmed)
       Name.new(parts, source)
     end
 
-    def pascal_case_to_snake_case(pascal_case_str)
+    def split_by_pascal_case(pascal_case_str)
       pascal_case_str.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
     end
 
