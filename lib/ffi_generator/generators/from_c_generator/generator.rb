@@ -591,9 +591,12 @@ module FFIGenerate
       trimmed = transform_by_renaming_imported_function_names(trimmed) if object_type == :is_function
       trimmed = trimmed.sub(/^(#{@prefixes.join('|')})/, '')
       trimmed = trimmed.sub(/(#{@suffixes.join('|')})$/, '')
-      # parts = trimmed.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?) # TODO: deprecate with prefixes
-      parts = trimmed.split(/_/).reject(&:empty?)
+      parts = pascal_case_to_snake_case(trimmed)
       Name.new(parts, source)
+    end
+
+    def pascal_case_to_snake_case(pascal_case_str)
+      pascal_case_str.split(/_|(?=[A-Z][a-z])|(?<=[a-z])(?=[A-Z])/).reject(&:empty?)
     end
 
     # Rename imported library function names based on regex patterns.
