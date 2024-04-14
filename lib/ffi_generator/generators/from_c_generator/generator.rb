@@ -327,6 +327,7 @@ module FFIGenerate
     end
 
     def read_function_declaration(declaration_cursor, comment, name)
+      function_name = name.raw
       function_description = []
       return_value_description = []
       parameter_descriptions = {}
